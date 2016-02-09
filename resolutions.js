@@ -2,9 +2,19 @@ Resolutions = new Mongo.Collection('resolutions');
 
 if (Meteor.isClient) {
   // template helper allows you to use information on the page
+  // we can't use anything in our templates without defined helpers
   Template.body.helpers({
     resolutions: function() {
-      return Resolutions.find();
+      if (Session.get('hideFinished')) {
+        return Resolutions.find({checked: {
+          $ne: true
+        }});
+      } else {
+        return Resolutions.find();
+      }
+    },
+    hideFinished: function() {
+      return Session.get('hideFinished');
     }
   });
 
@@ -22,6 +32,11 @@ if (Meteor.isClient) {
 
       // we don't want page refreshing
       return false;
+    },
+    'change .hide-finished': function(event) {
+      // only for current session
+      // bind session variable and state of checkbox
+      Session.set('hideFinished', event.target.checked)
     }
   });
 
