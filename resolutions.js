@@ -26,10 +26,16 @@ if (Meteor.isClient) {
   });
 
   Template.resolution.events({
-    'click .delete': function() {
+    'click .toggle-checked': function() {
+      Resolutions.update(this._id, {$set :{
+        checked: !this.checked
+      }});
+    },
+    'click .delete': function(event) {
       Resolutions.remove(this._id);
     }
   });
+
 }
 
 if (Meteor.isServer) {
