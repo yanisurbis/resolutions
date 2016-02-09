@@ -6,7 +6,24 @@ if (Meteor.isClient) {
     resolutions: function() {
       return Resolutions.find();
     }
-  })
+  });
+
+  Template.body.events({
+    'submit .new-resolution': function(event) {
+      var title = event.target.title.value;
+
+      console.log("hi");
+      Resolutions.insert({
+        title: title,
+        createdAt: new Date()
+      });
+
+      event.target.title.value = "";
+
+      // we don't want page refreshing
+      return false;
+    }
+  });
 }
 
 if (Meteor.isServer) {
