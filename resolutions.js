@@ -51,6 +51,10 @@ if (Meteor.isClient) {
     }
   });
 
+  // no emails
+  Accounts.ui.config({
+    passwordSignupFields: "USERNAME_ONLY"
+  });
 }
 
 if (Meteor.isServer) {
