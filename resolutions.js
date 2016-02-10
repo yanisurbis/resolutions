@@ -22,11 +22,7 @@ if (Meteor.isClient) {
     'submit .new-resolution': function(event) {
       var title = event.target.title.value;
 
-      console.log("hi");
-      Resolutions.insert({
-        title: title,
-        createdAt: new Date()
-      });
+      Meteor.call("addResolution", title);
 
       event.target.title.value = "";
 
@@ -62,3 +58,13 @@ if (Meteor.isServer) {
     // code to run on server at startup
   })
 }
+
+// methods on our database that our application has acess to
+Meteor.methods({
+  addResolution: function(title) {
+    Resolutions.insert({
+      title: title,
+      createdAt: new Date()
+    });
+  }
+})
