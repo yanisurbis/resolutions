@@ -1,6 +1,9 @@
 Resolutions = new Mongo.Collection('resolutions');
 
 if (Meteor.isClient) {
+  // subscribing to database
+  Meteor.subscribe('resolutions');
+
   // template helper allows you to use information on the page
   // we can't use anything in our templates without defined helpers
   Template.body.helpers({
@@ -54,7 +57,11 @@ if (Meteor.isClient) {
 if (Meteor.isServer) {
   Meteor.startup(function () {
     // code to run on server at startup
-  })
+  });
+
+  Meteor.publish('resolutions', function() {
+    return Resolutions.find();
+  });
 }
 
 // methods on our database that our application has acess to
