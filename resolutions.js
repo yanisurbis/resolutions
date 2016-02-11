@@ -21,12 +21,18 @@ if (Meteor.isClient) {
     }
   });
 
+
+
+
   Template.body.events({
     'submit .new-resolution': function(event) {
       var title = event.target.title.value;
 
-      Meteor.call("addResolution", title);
-
+      if (title.length != 0) {
+        Meteor.call("addResolution", title);
+      } else {
+        alert("The Submit field is empty!");
+      }
       event.target.title.value = "";
 
       // we don't want page refreshing
@@ -45,6 +51,15 @@ if (Meteor.isClient) {
     },
     'click .delete': function(event) {
       Meteor.call("deleteResolution", this._id);
+    },
+    'click .toggle-private': function() {
+      Meteor.call('setPrivate', this._id, !this.private);
+    }
+  });
+
+  Template.resolution.helpers({
+    isOwner: function() {
+      return this.owner === Meteor.userId();
     }
   });
 
@@ -60,7 +75,12 @@ if (Meteor.isServer) {
   });
 
   Meteor.publish('resolutions', function() {
-    return Resolutions.find();
+    return Resolutions.find({
+      $or: [
+        { private: {$ne: true} },
+        { owner: this.userId }
+      ]
+    });
   });
 }
 
@@ -69,7 +89,8 @@ Meteor.methods({
   addResolution: function(title) {
     Resolutions.insert({
       title: title,
-      createdAt: new Date()
+      createdAt: new Date(),
+      owner: Meteor.userId()
     });
   },
   updateResolution: function(id, checked) {
@@ -79,5 +100,16 @@ Meteor.methods({
   },
   deleteResolution: function(id) {
     Resolutions.remove(id);
+  },
+  setPrivate: function(id, private) {
+    var res = Resolutions.findOne(id);
+
+    if(res.owner !== Meteor.userId()) {
+      throw new Meteor.Error('not-authorized');
+    }
+
+    Resolutions.update(id, {$set :{
+      private: private
+    }});
   }
 })
